@@ -23,6 +23,13 @@
             <label>Moves:</label>
             <span>0</span>
          </div>
+         <div class="bg-picker">
+            <label for="bg-select">Table:</label>
+            <select id="bg-select">
+               <option value="green_felt.jpg">Green</option>
+               <option value="blue_felt.jpg">Blue</option>
+            </select>
+         </div>
          <div class="score" data-score="0">
             <label>Score:</label>
             <span>0</span>
@@ -288,7 +295,11 @@
       </li>
    </ul><!-- /.templates -->
 <!-- partial -->
-  <script  src="./js/script.js"></script>
-
+  <script src="./js/script.js"></script>
+  <script>
+    document.getElementById('bg-select').addEventListener('change', function() {
+      document.body.style.backgroundImage = "url('./img/" + this.value + "')";
+    });
+  </script>
 </body>
 </html>
