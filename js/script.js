@@ -1624,3 +1624,94 @@ Optional Features:
          tick();
 
       }
+
+// ### NEW GAME ###
+   function newGame() {
+
+      // stop timer and clear any pending timeouts
+      clearInterval(clock);
+      clearTimeout(clickTimer);
+
+      // remove play/pause button listeners if bound
+      if (typeof pauseTimer === 'function') $playPause.removeEventListener('click', pauseTimer);
+      if (typeof playTimer === 'function') $playPause.removeEventListener('click', playTimer);
+
+      // reset timer state and display
+      clock = 0;
+      time = 0;
+      delete $timer.dataset.action;
+      delete d.body.dataset.gameplay;
+      $timerSpan.textContent = '00:00';
+
+      // reset click state
+      clicks = 0;
+      clickTimer = null;
+      lastEventTime = 0;
+
+      // reset move count and display
+      moves = 0;
+      $moveCount.dataset.moves = 0;
+      $moveCountSpan.textContent = '0';
+
+      // reset score and display
+      score = 0;
+      bonus = 0;
+      $score.dataset.score = 0;
+      $scoreSpan.textContent = '0';
+
+      // hide auto-win button
+      $autoWin.style.display = 'none';
+      $autoWin.removeEventListener('click', autoWin);
+
+      // clear confetti canvas
+      var confettiCanvas = d.getElementById('confetti');
+      confettiCanvas.style.opacity = 0;
+      var confettiCtx = confettiCanvas.getContext('2d');
+      confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+      // clean up any active drag or touch
+      if (dragClone) {
+         try { d.body.removeChild(dragClone); } catch(e) {}
+         dragClone = null;
+      }
+      isDragging = false;
+      d.removeEventListener('touchmove', onTouchMove);
+      d.removeEventListener('touchend', onTouchEnd);
+      touchDragCard = null;
+
+      // rebuild all table data structures
+      deck = [];
+      s = [];
+      w = [];
+      spades = [];
+      hearts = [];
+      diamonds = [];
+      clubs = [];
+      t = [];
+      t[1] = t[2] = t[3] = t[4] = t[5] = t[6] = t[7] = [];
+      table = [];
+      table['stock'] = s;
+      table['waste'] = w;
+      table['spades'] = spades;
+      table['hearts'] = hearts;
+      table['diamonds'] = diamonds;
+      table['clubs'] = clubs;
+      table['tab'] = t;
+      unplayedTabCards = [];
+
+      // reset table DOM dataset
+      reset(table);
+
+      // clear DOM before render so checkForPlayedCards finds no stale cards
+      var piles = d.querySelectorAll('#stock ul, #waste ul, #fnd ul, #tab ul');
+      for (var i = 0; i < piles.length; i++) { piles[i].innerHTML = ''; }
+
+      // deal and start a new game
+      deck = create(deck, suits);
+      deck = shuffle(deck);
+      table = deal(deck, table);
+      render(table, playedCards);
+      play(table);
+   }
+
+   d.querySelector('#new-game').addEventListener('click', newGame);
