@@ -14,6 +14,14 @@ html, body {
    height: 100%;
    overscroll-behavior: none;
 }
+.container {
+   width: 100%;
+   padding-right: 15px;
+   padding-left: 15px;
+   margin-right: auto;
+   margin-left: auto;
+   max-width: 1140px;
+}
 body {
    position: relative;
    color: #f3f5f7;
@@ -563,10 +571,39 @@ body {
    .fnd .pile {
       left: 43.5%;
    }
-   .fnd .pile.spades::before { content: '' }
-   .fnd .pile.hearts::before { content: '' }
-   .fnd .pile.diamonds::before { content: '' }
-   .fnd .pile.clubs::before { content: '' }
+   .fnd .pile::before {
+      content '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      color: #000;
+      font-family: 'Suit-Regular', sans-serif;
+      font-size: 10vw;
+      margin-top: -0.6em;
+      line-height: 1;
+      text-align: center;
+      opacity: 0.25;
+   }
+   @media screen and (min-width: 768px) {
+      .fnd .pile::before {
+         font-size: 6em;
+      }
+   }
+   @media screen and (min-width: 992px) {
+      .fnd .pile::before {
+         font-size: 7em;
+      }
+   }
+   @media screen and (min-width: 1200px) {
+      .fnd .pile::before {
+         font-size: 8em;
+      }
+   }
+   .fnd .pile.spades::before { content: '♠' }
+   .fnd .pile.hearts::before { content: '♥' }
+   .fnd .pile.diamonds::before { content: '♦' }
+   .fnd .pile.clubs::before { content: '♣' }
 
 /* tableau */
    .tab .card {
