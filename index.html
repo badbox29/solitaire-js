@@ -288,25 +288,6 @@
          </div>
       </li>
    </ul><!-- /.templates -->
-<!-- partial -->
-  <script src="./js/script.js"></script>
-  <script>
-    document.getElementById('bg-select').addEventListener('change', function() {
-      document.body.style.backgroundImage = "url('./img/" + this.value + "')";
-    });
-    document.getElementById('card-back-select').addEventListener('change', function() {
-      var style = document.getElementById('card-back-style');
-      if (!style) {
-        style = document.createElement('style');
-        style.id = 'card-back-style';
-        document.head.appendChild(style);
-      }
-      style.textContent =
-        '.card { background-image: url("./img/' + this.value + '") !important; }' +
-        '.card.up { background-image: url("./img/card_face_bg.png") !important; }';
-    });
-  </script>
-
   <div id="bottom-bar">
     <div class="bg-picker">
       <label for="bg-select">Table:</label>
@@ -329,6 +310,23 @@
       </select>
     </div>
   </div>
-
+<!-- partial -->
+  <script src="./js/script.js"></script>
+  <script>
+    document.getElementById('bg-select').addEventListener('change', function() {
+      document.body.style.backgroundImage = "url('./img/" + this.value + "')";
+    });
+    document.getElementById('card-back-select').addEventListener('change', function() {
+      var style = document.getElementById('card-back-style');
+      if (!style) {
+        style = document.createElement('style');
+        style.id = 'card-back-style';
+        document.head.appendChild(style);
+      }
+      style.textContent =
+        '.card { background-image: url("./img/' + this.value + '") !important; }' +
+        '.card.up { background-image: url("./img/card_face_bg.png") !important; }';
+    });
+  </script>
 </body>
 </html>
