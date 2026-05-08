@@ -243,14 +243,32 @@ body {
    display: none;
    -webkit-appearance: none;
    outline: none;
-   border: 0;
    position: absolute;
-   z-index: 1;
-   bottom: 0;
-   width: 100%;
-   background: rgba(0,0,0,.8);
-   padding: 1em;
-   line-height: 1;
+   left: 29%;
+   top: 0;
+   width: 13%;
+   height: 100%;
+   background: rgba(0,0,0,0.2);
+   border: 2px dotted rgba(255,255,255,0.4);
+   border-radius: 5px;
+   color: #f3f5f7;
+   cursor: pointer;
+   font-size: 0.75em;
+   letter-spacing: 0.05em;
+   line-height: 1.4;
+   text-transform: uppercase;
+   z-index: 2;
+   transition: background-color 0.2s, border-color 0.2s;
+}
+#auto-win:hover {
+   background: rgba(0,0,0,0.38);
+   border-color: rgba(255,255,255,0.65);
+}
+@media screen and (min-width: 768px) {
+   #auto-win {
+      border-radius: 10px;
+      font-size: 0.85em;
+   }
 }
 #table {
    opacity: 0;
