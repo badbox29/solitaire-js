@@ -846,7 +846,7 @@ body {
    .tab .pile[data-unplayed='2'] .card:nth-child(21) { top: 114em;  left: 0; }
    /* Confetti */
    #confetti {
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
       z-index: 10000;
