@@ -314,13 +314,16 @@
       </select>
     </div>
   </div>
-<!-- partial -->
+  <!-- partial -->
   <script src="./js/script.js"></script>
   <script>
-    document.getElementById('bg-select').addEventListener('change', function() {
-      document.body.style.backgroundImage = "url('./img/" + this.value + "')";
-    });
-    document.getElementById('card-back-select').addEventListener('change', function() {
+    // apply a table background
+    function applyTable(val) {
+      document.body.style.backgroundImage = "url('./img/" + val + "')";
+    }
+
+    // apply a card back
+    function applyCardBack(val) {
       var style = document.getElementById('card-back-style');
       if (!style) {
         style = document.createElement('style');
@@ -328,8 +331,32 @@
         document.head.appendChild(style);
       }
       style.textContent =
-        '.card { background-image: url("./img/' + this.value + '") !important; }' +
+        '.card { background-image: url("./img/' + val + '") !important; }' +
         '.card.up { background-image: url("./img/card_face_bg.png") !important; }';
+    }
+
+    // restore saved settings on load
+    var savedTable = localStorage.getItem('solitaire_table');
+    if (savedTable) {
+      document.getElementById('bg-select').value = savedTable;
+      applyTable(savedTable);
+    }
+
+    var savedCard = localStorage.getItem('solitaire_card');
+    if (savedCard) {
+      document.getElementById('card-back-select').value = savedCard;
+      applyCardBack(savedCard);
+    }
+
+    // save and apply on change
+    document.getElementById('bg-select').addEventListener('change', function() {
+      localStorage.setItem('solitaire_table', this.value);
+      applyTable(this.value);
+    });
+
+    document.getElementById('card-back-select').addEventListener('change', function() {
+      localStorage.setItem('solitaire_card', this.value);
+      applyCardBack(this.value);
     });
   </script>
 </body>
