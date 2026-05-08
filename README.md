@@ -14,6 +14,7 @@ A fully client-side Klondike Solitaire game built with vanilla HTML, CSS, and Ja
 - Move single cards or entire face-up stacks between tableau columns
 - Double-click any card to automatically send it to the correct foundation pile
 - **Flexible ace placement** — aces can be placed in any of the four foundation slots, not just their matching suit slot, and can be repositioned between slots afterward
+- **New Game button** — start a fresh deal at any time without reloading the page
 - Auto-Win button appears when all remaining cards are face-up, completing the game automatically with animation
 - Confetti celebration on winning
 
@@ -35,8 +36,9 @@ A fully client-side Klondike Solitaire game built with vanilla HTML, CSS, and Ja
 - Time-based bonus points on completion (700,000 ÷ seconds elapsed)
 
 ### Customization
-- **Table color picker** — switch the felt background on the fly between Green, Blue, Red, Brown, Grey, and Purple
-- **Card back picker** — switch card back designs on the fly between Red (default), Gold, Black, and Cream
+- **Table color picker** — switch the felt background on the fly; available in Green, Blue, Red, Brown, Grey, and Purple
+- **Card back picker** — switch card back designs on the fly; multiple designs supported
+- **Persistent preferences** — table color and card back selection are saved to browser localStorage and automatically restored when you return to the game, even after the browser tab has been killed and reloaded by the OS
 
 ### Technical
 - Zero external dependencies — Bootstrap replaced with a minimal hand-crafted reset
@@ -44,6 +46,7 @@ A fully client-side Klondike Solitaire game built with vanilla HTML, CSS, and Ja
 - Responsive layout that works across desktop, tablet, and mobile screen sizes
 - Touch drag-and-drop uses native touch events with a floating card clone and drop target highlighting
 - Pull-to-refresh disabled during gameplay on mobile
+- Settings persist via localStorage — no account or server needed
 
 ---
 
@@ -74,6 +77,18 @@ A fully client-side Klondike Solitaire game built with vanilla HTML, CSS, and Ja
 
 ---
 
+## Adding Card Backs
+
+Drop any PNG into the `/img/` folder and add an `<option>` to the card back `<select>` in the `#bottom-bar` section of `index.html`:
+
+```html
+<option value="your_filename.png">Your Label</option>
+```
+
+The picker and localStorage persistence handle the rest automatically.
+
+---
+
 ## Running Locally
 
 No build step needed. Just serve the root directory with any static file server:
@@ -92,6 +107,6 @@ Then open `http://localhost:8080` in your browser.
 
 ## Credits
 
-Originally forked from [solitaire-js by bfa](https://github.com/bfa/solitaire-js). Extended with drag-and-drop, flexible foundation rules, customization controls, and a self-hosted asset pipeline.
+Originally forked from [solitaire-js by bfa](https://github.com/bfa/solitaire-js). Extended with drag-and-drop, flexible foundation rules, customization controls, persistent preferences, and a self-hosted asset pipeline.
 
 Card suit font by [@donpark](https://donpark.github.io/scalable-css-playing-cards/).
