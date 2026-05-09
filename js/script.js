@@ -675,6 +675,7 @@ Optional Features:
          e.classList.add('touching');
          d.addEventListener('touchmove', onTouchMove, {passive: false});
          d.addEventListener('touchend', onTouchEnd, {passive: false});
+         d.addEventListener('touchcancel', onTouchCancel, {passive: false});
       }
 
       function onTouchMove(event) {
@@ -726,6 +727,7 @@ Optional Features:
       function onTouchEnd(event) {
          d.removeEventListener('touchmove', onTouchMove);
          d.removeEventListener('touchend', onTouchEnd);
+         d.removeEventListener('touchcancel', onTouchCancel);
          if (touchDragCard) touchDragCard.classList.remove('touching');
          var highlighted = d.querySelectorAll('.drag-over');
          for (var i = 0; i < highlighted.length; i++) {
@@ -749,6 +751,28 @@ Optional Features:
          reset(table);
          render(table, playedCards);
          play(table);
+      }
+
+      function onTouchCancel(event) {
+         d.removeEventListener('touchmove', onTouchMove);
+         d.removeEventListener('touchend', onTouchEnd);
+         d.removeEventListener('touchcancel', onTouchCancel);
+         if (touchDragCard) touchDragCard.classList.remove('touching');
+         var highlighted = d.querySelectorAll('.drag-over');
+         for (var i = 0; i < highlighted.length; i++) {
+            highlighted[i].classList.remove('drag-over');
+         }
+         if (dragClone) {
+            try { d.body.removeChild(dragClone); } catch(e) {}
+            dragClone = null;
+         }
+         isDragging = false;
+         touchDragCard = null;
+         if ($table.dataset.move) {
+            reset(table);
+            render(table, playedCards);
+            play(table);
+         }
       }
 
       // shared drop logic for mouse and touch
@@ -1620,7 +1644,16 @@ Optional Features:
       isDragging = false;
       d.removeEventListener('touchmove', onTouchMove);
       d.removeEventListener('touchend', onTouchEnd);
+      d.removeEventListener('touchcancel', onTouchCancel);
       touchDragCard = null;
+
+      // sweep any stray clone cards left in body
+      var bodyChildren = Array.prototype.slice.call(d.body.children);
+      for (var i = 0; i < bodyChildren.length; i++) {
+         if (bodyChildren[i].classList.contains('card')) {
+            try { d.body.removeChild(bodyChildren[i]); } catch(e) {}
+         }
+      }
 
       // rebuild all table data structures
       deck = [];
