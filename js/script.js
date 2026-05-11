@@ -1083,6 +1083,7 @@ Optional Features:
 			}
 			return true;
 		 }
+	  }
 
    // make move
       function makeMove() {
