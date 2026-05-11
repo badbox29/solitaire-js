@@ -796,6 +796,26 @@ Optional Features:
             play(table);
             return;
          }
+         // If dropping on a foundation pile, the grabbed card must be the actual
+         // top card of its source pile — not a middle card with cards stacked on top.
+         if (isFnd) {
+            var sourcePile = $table.dataset.source;
+            var sourcePileData;
+            if (sourcePile && !isNaN(sourcePile)) {
+               sourcePileData = table['tab'][parseInt(sourcePile)];
+            } else if (sourcePile) {
+               sourcePileData = table[sourcePile];
+            }
+            if (sourcePileData && sourcePileData.length > 0) {
+               var topCard = sourcePileData[sourcePileData.length - 1];
+               if (topCard[0] !== selected[0] || topCard[1] !== selected[1]) {
+                  reset(table);
+                  render(table, playedCards);
+                  play(table);
+                  return;
+               }
+            }
+         }
          if (validateMove(selected, dest)) {
             makeMove();
             reset(table);
