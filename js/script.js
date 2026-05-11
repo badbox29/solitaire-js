@@ -1075,12 +1075,14 @@ Optional Features:
          }
 
          // if destination is empty tableau pile
-         if ( dest >= 1 && dest <= 7 ) {
-            console.log('Destination appears tp be empty tableau');
-            return true;
-         }
-
-      }
+		 if ( dest >= 1 && dest <= 7 ) {
+			console.log('Destination appears to be empty tableau');
+			if ( sRank !== 13 ) {
+				console.log('Only kings can be placed on empty tableau piles');
+				return false;
+			}
+			return true;
+		 }
 
    // make move
       function makeMove() {
