@@ -671,7 +671,10 @@ Optional Features:
          touchStartX = event.touches[0].clientX;
          touchStartY = event.touches[0].clientY;
          isDragging = false;
-         dragClone = null;
+		 if (dragClone) {
+		    try { d.body.removeChild(dragClone); } catch(err) {}
+		    dragClone = null;
+		 }
          e.classList.add('touching');
          d.addEventListener('touchmove', onTouchMove, {passive: false});
          d.addEventListener('touchend', onTouchEnd, {passive: false});
@@ -1260,16 +1263,20 @@ Optional Features:
 
    // reset table
       function reset(table) {
-         delete $table.dataset.move;
-         delete $table.dataset.selected;
-         delete $table.dataset.source;
-         delete $table.dataset.dest;
-         delete $fnd.dataset.played;
-         delete $fnd.dataset.unplayed;
-         delete $tab.dataset.played;
-         delete $tab.dataset.unplayed;
-         console.log('Table reset');
-      }
+		 delete $table.dataset.move;
+	     delete $table.dataset.selected;
+	     delete $table.dataset.source;
+	     delete $table.dataset.dest;
+	     delete $fnd.dataset.played;
+	     delete $fnd.dataset.unplayed;
+	     delete $tab.dataset.played;
+	     delete $tab.dataset.unplayed;
+	     var selectedCards = d.querySelectorAll('.card[data-selected="true"]');
+	     for (var i = 0; i < selectedCards.length; i++) {
+		    delete selectedCards[i].dataset.selected;
+	     }
+	     console.log('Table reset');
+	  }
 
    // timer funcion
       function timer(action) {
