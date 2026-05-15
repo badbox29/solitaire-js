@@ -70,6 +70,7 @@ body {
    background-size: cover;
    background-position: center;
    padding-bottom: 4em;
+   touch-action: manipulation;
 }
 .navbar {
    background: rgba(8,8,8,.75);
