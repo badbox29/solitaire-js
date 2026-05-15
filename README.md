@@ -51,6 +51,7 @@ A fully client-side Klondike Solitaire game built with vanilla HTML, CSS, and Ja
 - Responsive layout that works across desktop, tablet, and mobile screen sizes
 - Touch drag-and-drop uses native touch events with a floating card clone and drop target highlighting
 - Pull-to-refresh disabled during gameplay on mobile
+- Pinch-to-zoom and double-click zoom disabled during gameplay on mobile (to protect viewport lock)
 - Settings persist via localStorage — no account or server needed
 
 ---
