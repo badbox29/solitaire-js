@@ -1720,4 +1720,17 @@ Optional Features:
       play(table);
    }
 
+	// prevent pinch-to-zoom (multi-touch)
+	document.addEventListener('touchmove', function(e) {
+	   if (e.touches.length > 1) e.preventDefault();
+	}, { passive: false });
+
+	// prevent double-tap zoom
+	var lastTap = 0;
+	document.addEventListener('touchend', function(e) {
+	   var now = Date.now();
+	   if (now - lastTap < 300) e.preventDefault();
+	   lastTap = now;
+	}, { passive: false });
+
    d.querySelector('#new-game').addEventListener('click', newGame);
