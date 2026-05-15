@@ -6,6 +6,11 @@ A fully client-side Klondike Solitaire game built with vanilla HTML, CSS, and Ja
 
 ---
 
+## Screenshot
+![Screenshot](solitaire-js.png)
+
+---
+
 ## Features
 
 ### Gameplay
