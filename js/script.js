@@ -1387,6 +1387,47 @@ Optional Features:
          console.log(bonus);
          return bonus;
       }
+	  
+	  // save score to storage
+	   function saveScore(score) {
+		  var scores = [];
+		  try {
+			 var result = window.storage ? window.storage.get('solitaire-scores') : null;
+			 if (result && result.value) scores = JSON.parse(result.value);
+		  } catch(e) { scores = []; }
+		  scores.push(score);
+		  scores.sort(function(a, b) { return b - a; });
+		  if (scores.length > 100) scores = scores.slice(0, 100);
+		  try {
+			 if (window.storage) window.storage.set('solitaire-scores', JSON.stringify(scores));
+		  } catch(e) {}
+		  return scores;
+	   }
+
+	// show win modal
+	   function showWinModal(currentScore) {
+		  var scores = saveScore(currentScore);
+		  var rank = scores.indexOf(currentScore);
+		  var total = scores.length;
+		  var start = Math.max(0, rank - 5);
+		  var end = Math.min(total, start + 11);
+		  if (end - start < 11) start = Math.max(0, end - 11);
+		  var visible = scores.slice(start, end);
+		  var list = d.getElementById('win-score-list');
+		  list.innerHTML = '';
+		  for (var i = 0; i < visible.length; i++) {
+			 var li = d.createElement('li');
+			 var globalRank = start + i + 1;
+			 var isCurrent = (start + i === rank);
+			 if (isCurrent) li.className = 'win-score-current';
+			 li.innerHTML =
+				'<span class="win-score-rank">#' + globalRank + '</span>' +
+				'<span class="win-score-value">' + visible[i] + '</span>' +
+				(isCurrent ? '<span class="win-score-you">you</span>' : '');
+			 list.appendChild(li);
+		  }
+		  d.getElementById('win-modal').classList.remove('win-modal-hidden');
+	   }
 
    // check for win
       function checkForWin(table) {
@@ -1401,6 +1442,8 @@ Optional Features:
             timer('stop');
             // bonus points for time
             updateScore(getBonus());
+			// show win modal
+			showWinModal(score);
             // throw confetti
             throwConfetti();
             // return true
@@ -1733,4 +1776,11 @@ Optional Features:
 	   lastTap = now;
 	}, { passive: false });
 
-   d.querySelector('#new-game').addEventListener('click', newGame);
+	d.querySelector('#new-game').addEventListener('click', newGame);
+	d.getElementById('win-modal-close').addEventListener('click', function() {
+		d.getElementById('win-modal').classList.add('win-modal-hidden');
+	});
+	d.getElementById('win-modal-new-game').addEventListener('click', function() {
+		d.getElementById('win-modal').classList.add('win-modal-hidden');
+		newGame();
+	});
