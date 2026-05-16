@@ -71,6 +71,20 @@
    </div><!-- /.container -->
 
    <canvas id="confetti"></canvas>
+   
+   <div id="win-modal" class="win-modal-hidden">
+      <div id="win-modal-box">
+         <div id="win-modal-header">
+            <button id="win-modal-close" title="Dismiss">&#x2715;</button>
+            <div id="win-modal-title">You Win!</div>
+            <div id="win-modal-subtitle">High Scores</div>
+         </div>
+         <ol id="win-score-list"></ol>
+         <div id="win-modal-footer">
+            <button id="win-modal-new-game">New Game</button>
+         </div>
+      </div>
+   </div>
 
    <ul class="template">
       <li data-rank="2">
@@ -356,8 +370,17 @@
 
     // save and apply on change
     document.getElementById('bg-select').addEventListener('change', function() {
-      localStorage.setItem('solitaire_table', this.value);
-      applyTable(this.value);
+       localStorage.setItem('solitaire_table', this.value);
+       applyTable(this.value);
+       var feltMap = {
+          'green_felt.jpg': 'green',
+          'blue_felt.jpg': 'blue',
+          'red_felt.jpg': 'red',
+          'brown_felt.jpg': 'brown',
+          'grey_felt.jpg': 'grey',
+          'purple_felt.jpg': 'purple'
+       };
+       document.body.dataset.felt = feltMap[this.value] || 'green';
     });
 
     document.getElementById('card-back-select').addEventListener('change', function() {
