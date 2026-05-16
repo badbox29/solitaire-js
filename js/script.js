@@ -1552,7 +1552,7 @@ Optional Features:
                i--;
                if (i !== 0) animation_loop();
                // at the end lets celebrate!
-               else throwConfetti();
+               else { showWinModal(score); throwConfetti(); }
             }, 100);
          };
          // run animation loop
