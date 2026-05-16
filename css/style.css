@@ -1012,7 +1012,17 @@ body {
 	#win-modal-new-game {
 	width: 100%;
 	padding: 10px;
+	background: var(--modal-btn-bg);
+	border: 1px solid rgba(255,255,255,0.2);
+	border-radius: 6px;
+	color: #f0d080;
+	font-size: 14px;
+	letter-spacing: 0.04em;
+	cursor: pointer;
 	}
+#win-modal-new-game:hover {
+   background: rgba(255,255,255,0.1);
+}
    
    /* Disable Grammarly */
    grammarly-card {
