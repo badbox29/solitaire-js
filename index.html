@@ -373,13 +373,19 @@
        localStorage.setItem('solitaire_table', this.value);
        applyTable(this.value);
        var feltMap = {
-          'green_felt.jpg': 'green',
-          'blue_felt.jpg': 'blue',
-          'red_felt.jpg': 'red',
-          'brown_felt.jpg': 'brown',
-          'grey_felt.jpg': 'grey',
-          'purple_felt.jpg': 'purple'
-       };
+		  'green_felt.jpg': 'green',
+		  'vines_felt.jpg': 'green',
+		  'blue_felt.jpg': 'blue',
+		  'ocean_felt.jpg': 'blue',
+		  'red_felt.jpg': 'red',
+		  'deco_felt.jpg': 'red',
+		  'brown_felt.jpg': 'brown',
+		  'desert_felt.jpg': 'brown',
+		  'grey_felt.jpg': 'grey',
+		  'gothic_felt.jpg': 'grey',
+		  'purple_felt.jpg': 'purple',
+		  'moonlight_felt.jpg': 'purple'
+		};
        document.body.dataset.felt = feltMap[this.value] || 'green';
     });
 
