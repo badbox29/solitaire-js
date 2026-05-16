@@ -1389,20 +1389,20 @@ Optional Features:
       }
 	  
 	  // save score to storage
-	   function saveScore(score) {
-		  var scores = [];
-		  try {
-			 var result = window.storage ? window.storage.get('solitaire-scores') : null;
-			 if (result && result.value) scores = JSON.parse(result.value);
-		  } catch(e) { scores = []; }
-		  scores.push(score);
-		  scores.sort(function(a, b) { return b - a; });
-		  if (scores.length > 100) scores = scores.slice(0, 100);
-		  try {
-			 if (window.storage) window.storage.set('solitaire-scores', JSON.stringify(scores));
-		  } catch(e) {}
-		  return scores;
-	   }
+		function saveScore(score) {
+		   var scores = [];
+		   try {
+			  var stored = localStorage.getItem('solitaire-scores');
+			  if (stored) scores = JSON.parse(stored);
+		   } catch(e) { scores = []; }
+		   scores.push(score);
+		   scores.sort(function(a, b) { return b - a; });
+		   if (scores.length > 100) scores = scores.slice(0, 100);
+		   try {
+			  localStorage.setItem('solitaire-scores', JSON.stringify(scores));
+		   } catch(e) {}
+		   return scores;
+		}
 
 	// show win modal
 	   function showWinModal(currentScore) {
