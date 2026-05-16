@@ -143,6 +143,7 @@ Optional Features:
    var bonus = 0;
    var lastEventTime = 0;
    var unplayedTabCards = [];
+   var lastSavedScore = null;
 
 // 1. CREATE DECK
    deck = create(deck, suits);
@@ -1389,20 +1390,25 @@ Optional Features:
       }
 	  
 	  // save score to storage
-		function saveScore(score) {
-		   var scores = [];
-		   try {
-			  var stored = localStorage.getItem('solitaire-scores');
-			  if (stored) scores = JSON.parse(stored);
-		   } catch(e) { scores = []; }
-		   scores.push(score);
-		   scores.sort(function(a, b) { return b - a; });
-		   if (scores.length > 100) scores = scores.slice(0, 100);
-		   try {
-			  localStorage.setItem('solitaire-scores', JSON.stringify(scores));
-		   } catch(e) {}
-		   return scores;
-		}
+	   function saveScore(score) {
+		  var scores = [];
+	      try {
+		     var stored = localStorage.getItem('solitaire-scores');
+		     if (stored) scores = JSON.parse(stored);
+	      } catch(e) { scores = []; }
+	      if (lastSavedScore !== null) {
+		     var idx = scores.indexOf(lastSavedScore);
+		     if (idx !== -1) scores.splice(idx, 1);
+	      }
+	      scores.push(score);
+	      scores.sort(function(a, b) { return b - a; });
+	      if (scores.length > 100) scores = scores.slice(0, 100);
+	      try {
+		     localStorage.setItem('solitaire-scores', JSON.stringify(scores));
+	      } catch(e) {}
+	      lastSavedScore = score;
+	      return scores;
+	   }
 
 	// show win modal
 	   function showWinModal(currentScore) {
@@ -1692,6 +1698,7 @@ Optional Features:
       // reset score and display
       score = 0;
       bonus = 0;
+	  lastSavedScore = null;
       $score.dataset.score = 0;
       $scoreSpan.textContent = '0';
 
