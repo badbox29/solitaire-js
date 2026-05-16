@@ -356,11 +356,26 @@
     }
 
     // restore saved settings on load
-    var savedTable = localStorage.getItem('solitaire_table');
-    if (savedTable) {
-      document.getElementById('bg-select').value = savedTable;
-      applyTable(savedTable);
-    }
+    var feltMap = {
+		'green_felt.jpg': 'green',
+		'vines_felt.jpg': 'green',
+		'blue_felt.jpg': 'blue',
+		'ocean_felt.jpg': 'blue',
+		'red_felt.jpg': 'red',
+		'deco_felt.jpg': 'red',
+		'brown_felt.jpg': 'brown',
+		'desert_felt.jpg': 'brown',
+		'grey_felt.jpg': 'grey',
+		'gothic_felt.jpg': 'grey',
+		'purple_felt.jpg': 'purple',
+		'moonlight_felt.jpg': 'purple'
+	};
+	var savedTable = localStorage.getItem('solitaire_table');
+	if (savedTable) {
+		document.getElementById('bg-select').value = savedTable;
+		applyTable(savedTable);
+		document.body.dataset.felt = feltMap[savedTable] || 'green';
+	}
 
     var savedCard = localStorage.getItem('solitaire_card');
     if (savedCard) {
@@ -372,20 +387,6 @@
     document.getElementById('bg-select').addEventListener('change', function() {
        localStorage.setItem('solitaire_table', this.value);
        applyTable(this.value);
-       var feltMap = {
-		  'green_felt.jpg': 'green',
-		  'vines_felt.jpg': 'green',
-		  'blue_felt.jpg': 'blue',
-		  'ocean_felt.jpg': 'blue',
-		  'red_felt.jpg': 'red',
-		  'deco_felt.jpg': 'red',
-		  'brown_felt.jpg': 'brown',
-		  'desert_felt.jpg': 'brown',
-		  'grey_felt.jpg': 'grey',
-		  'gothic_felt.jpg': 'grey',
-		  'purple_felt.jpg': 'purple',
-		  'moonlight_felt.jpg': 'purple'
-		};
        document.body.dataset.felt = feltMap[this.value] || 'green';
     });
 
