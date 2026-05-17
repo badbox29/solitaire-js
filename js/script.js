@@ -2318,14 +2318,17 @@ Optional Features:
 	if (kvWorkerUrl && kvToken) {
 		setKvIndicator('green');
 		kvCheckStatus();
-		// sync prefs — send local prefs with their timestamp, apply if KV is newer
+		// sync prefs — only send local prefs if we actually have stored timestamps
+		var tableTime = parseInt(localStorage.getItem('solitaire_table_time') || '0');
+		var cardTime = parseInt(localStorage.getItem('solitaire_card_time') || '0');
+		var pageLoadTime = Math.max(tableTime, cardTime);
+		var hasLocalPrefs = localStorage.getItem('solitaire_table_time') !== null ||
+		                    localStorage.getItem('solitaire_card_time') !== null;
 		var pageLoadPrefs = {
 			table: localStorage.getItem('solitaire_table') || 'green_felt.jpg',
 			card: localStorage.getItem('solitaire_card') || 'card_back_bg.png'
 		};
-		var pageLoadTime = Math.max(
-			parseInt(localStorage.getItem('solitaire_table_time') || '0'),
-			parseInt(localStorage.getItem('solitaire_card_time') || '0')
-		);
+		// if no local prefs ever set, send timestamp of 0 with no prefs so KV always wins
+		if (!hasLocalPrefs) pageLoadTime = -1;
 		kvSyncPrefs(pageLoadPrefs, pageLoadTime);
 	}
