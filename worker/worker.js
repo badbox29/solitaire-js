@@ -22,6 +22,7 @@ export default {
     if (method === 'POST' && path === '/sync')     return handleSync(request, env, cors);
     if (method === 'GET'  && path.startsWith('/user/'))   return handleUser(request, env, cors);
     if (method === 'GET'  && path.startsWith('/search/')) return handleSearch(request, env, cors);
+    if (method === 'POST' && path === '/prefs')           return handlePrefs(request, env, cors);
 
     return new Response(JSON.stringify({ error: 'Not found' }), {
       status: 404,
@@ -175,6 +176,43 @@ async function handleSearch(request, env, cors) {
       return json({ available: false, username }, 200, cors);
     } else {
       return json({ available: true, username }, 200, cors);
+    }
+
+  } catch(e) {
+    return json({ error: 'Server error' }, 500, cors);
+  }
+}
+
+async function handlePrefs(request, env, cors) {
+  try {
+    const body = await request.json();
+    const token = (body.token || '').trim();
+    const incoming = body.prefs || null;
+    const incomingTime = body.timestamp || 0;
+
+    if (!token) {
+      return json({ error: 'Token is required' }, 400, cors);
+    }
+
+    // Validate token
+    const username = await env.soljs.get('token:' + token);
+    if (!username) {
+      return json({ error: 'Invalid token' }, 401, cors);
+    }
+
+    // Get existing prefs record
+    const stored = await env.soljs.get('prefs:' + username);
+    const existing = stored ? JSON.parse(stored) : { prefs: null, timestamp: 0 };
+
+    // Newest wins
+    if (incoming && incomingTime >= existing.timestamp) {
+      // Incoming is newer — save it
+      const record = { prefs: incoming, timestamp: incomingTime };
+      await env.soljs.put('prefs:' + username, JSON.stringify(record));
+      return json({ success: true, prefs: incoming, timestamp: incomingTime, source: 'client' }, 200, cors);
+    } else {
+      // KV is newer — return it
+      return json({ success: true, prefs: existing.prefs, timestamp: existing.timestamp, source: 'server' }, 200, cors);
     }
 
   } catch(e) {
