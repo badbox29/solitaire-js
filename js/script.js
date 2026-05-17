@@ -2047,11 +2047,13 @@ Optional Features:
 			connectBtn.textContent = 'Connect';
 			connectBtn.disabled = false;
 		} else {
-			// new user
+			// new user — show token field for existing account import
 			usernameInput.value = '';
 			usernameInput.disabled = false;
 			tokenInput.value = '';
-			tokenField.style.display = 'none';
+			tokenInput.placeholder = 'Paste token here to connect existing account';
+			tokenField.style.display = 'block';
+			d.getElementById('settings-token-change').style.display = 'none';
 			connectBtn.textContent = 'Register';
 			connectBtn.disabled = true;
 			d.getElementById('settings-username-status').textContent = '';
@@ -2062,9 +2064,21 @@ Optional Features:
 		d.getElementById('settings-modal').classList.remove('settings-modal-hidden');
 	}
 
-	// username availability check with debounce
-	var usernameCheckTimer = null;
-	d.getElementById('settings-username').addEventListener('input', function() {
+	// enable connect button when token is pasted on fresh device
+	d.getElementById('settings-token').addEventListener('input', function() {
+		var val = this.value.trim();
+		var connectBtn = d.getElementById('settings-connect-btn');
+		if (!kvToken && !kvUsername) {
+			// fresh device — token input drives the button
+			if (val.length > 0) {
+				connectBtn.textContent = 'Connect';
+				connectBtn.disabled = false;
+			} else {
+				connectBtn.textContent = 'Register';
+				connectBtn.disabled = true;
+			}
+		}
+	});
 		var val = this.value.toLowerCase().trim();
 		var status = d.getElementById('settings-username-status');
 		var connectBtn = d.getElementById('settings-connect-btn');
