@@ -447,14 +447,28 @@
 
     // save and apply on change
     document.getElementById('bg-select').addEventListener('change', function() {
+       var now = Date.now();
        localStorage.setItem('solitaire_table', this.value);
+       localStorage.setItem('solitaire_table_time', now);
        applyTable(this.value);
        document.body.dataset.felt = feltMap[this.value] || 'green';
+       var prefs = {
+          table: this.value,
+          card: localStorage.getItem('solitaire_card') || 'card_back_bg.png'
+       };
+       kvSyncPrefs(prefs, now);
     });
 
     document.getElementById('card-back-select').addEventListener('change', function() {
-      localStorage.setItem('solitaire_card', this.value);
-      applyCardBack(this.value);
+       var now = Date.now();
+       localStorage.setItem('solitaire_card', this.value);
+       localStorage.setItem('solitaire_card_time', now);
+       applyCardBack(this.value);
+       var prefs = {
+          table: localStorage.getItem('solitaire_table') || 'green_felt.jpg',
+          card: this.value
+       };
+       kvSyncPrefs(prefs, now);
     });
   </script>
 </body>
