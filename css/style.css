@@ -929,7 +929,7 @@ body {
 #win-modal-box {
    width: 340px;
    background: var(--modal-bg);
-   border: 1px solid rgba(255,255,255,0.1);
+   border: 1px solid #f0d080;
    border-radius: 16px;
    overflow: hidden;
    pointer-events: auto;
