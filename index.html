@@ -69,6 +69,52 @@
       </div>
 
    </div><!-- /.container -->
+   
+   <div id="settings-modal" class="settings-modal-hidden">
+      <div id="settings-modal-box">
+         <div id="settings-modal-header">
+            <button id="settings-modal-close" title="Dismiss">&#x2715;</button>
+            <div id="settings-modal-title">Settings</div>
+         </div>
+         <div id="settings-modal-body">
+
+            <div class="settings-section">
+               <div class="settings-section-title">KV Sync</div>
+               <div class="settings-field">
+                  <label>Worker URL</label>
+                  <input type="text" id="settings-worker-url" placeholder="https://your-worker.workers.dev">
+               </div>
+               <div class="settings-field" id="settings-username-field">
+                  <label>Username</label>
+                  <input type="text" id="settings-username" placeholder="3+ chars, letters/numbers/-/_">
+                  <div id="settings-username-status"></div>
+               </div>
+               <div class="settings-field" id="settings-token-field">
+                  <label>Token</label>
+                  <div class="settings-token-row">
+                     <input type="password" id="settings-token" placeholder="Paste token to connect existing account">
+                     <button id="settings-token-copy" title="Copy token">Copy</button>
+                  </div>
+                  <button id="settings-token-change">Change Token</button>
+               </div>
+               <button id="settings-connect-btn" disabled>Register</button>
+            </div>
+
+            <div class="settings-section">
+               <div class="settings-section-title">Friends</div>
+               <div class="settings-field">
+                  <div class="settings-search-row">
+                     <input type="text" id="settings-friend-search" placeholder="Search username">
+                     <button id="settings-friend-search-btn">Search</button>
+                  </div>
+                  <div id="settings-search-result"></div>
+               </div>
+               <ul id="settings-friends-list"></ul>
+            </div>
+
+         </div>
+      </div>
+   </div>
 
    <canvas id="confetti"></canvas>
    
@@ -76,10 +122,11 @@
       <div id="win-modal-box">
          <div id="win-modal-header">
             <button id="win-modal-close" title="Dismiss">&#x2715;</button>
+            <button id="win-modal-refresh" title="Refresh scores">&#x21BB;</button>
             <div id="win-modal-title">You Win!</div>
             <div id="win-modal-subtitle">High Scores</div>
-				<div id="win-modal-divider"><span>&#9671;</span></div>
-			</div>
+            <div id="win-modal-divider"><span>&#9671;</span></div>
+         </div>
          <ol id="win-score-list"></ol>
          <div id="win-modal-footer">
             <button id="win-modal-new-game">New Game</button>
@@ -304,9 +351,16 @@
       </li>
    </ul><!-- /.templates -->
   <div id="bottom-bar">
+	<div id="kv-status" class="kv-status" style="display:none">
+	  <span id="kv-indicator" class="kv-indicator"></span>
+	  <label>Worker Status</label>
+	</div>
 	<div class="bg-picker">
 	  <label for="show-scores-toggle">Show High Scores</label>
 	  <input type="checkbox" id="show-scores-toggle" checked>
+	</div>
+	<div id="scores-btn-wrap" class="bg-picker" style="display:none">
+	  <button id="scores-btn">🏆 Scores</button>
 	</div>
     <div class="bg-picker">
       <label for="bg-select">Table:</label>
@@ -337,6 +391,9 @@
         <option value="card_back_bg_mustache.png">Mustache</option>
         <option value="card_back_bg_pearls.png">Pearls</option>
       </select>
+    </div>
+    <div class="bg-picker">
+      <button id="settings-btn">⚙️ Settings</button>
     </div>
   </div>
   <!-- partial -->
