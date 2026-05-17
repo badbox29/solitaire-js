@@ -1454,6 +1454,45 @@ Optional Features:
             })
             .catch(function() { setKvIndicator('red'); return null; });
       }
+	  
+	  function kvSyncPrefs(prefs, timestamp) {
+         if (!kvWorkerUrl || !kvToken) return Promise.resolve(null);
+         return kvRequest('/prefs', 'POST', {
+            token: kvToken,
+            prefs: prefs,
+            timestamp: timestamp
+         }).then(function(data) {
+            if (data.success && data.source === 'server' && data.prefs) {
+               // KV has newer prefs — apply them locally
+               applyPrefs(data.prefs, data.timestamp);
+            }
+            return data;
+         }).catch(function() { return null; });
+      }
+
+      function applyPrefs(prefs, timestamp) {
+         if (prefs.table) {
+            localStorage.setItem('solitaire_table', prefs.table);
+            localStorage.setItem('solitaire_table_time', timestamp);
+            applyTable(prefs.table);
+            var feltMap = {
+               'green_felt.jpg': 'green', 'vines_felt.jpg': 'green',
+               'blue_felt.jpg': 'blue', 'ocean_felt.jpg': 'blue',
+               'red_felt.jpg': 'red', 'deco_felt.jpg': 'red',
+               'brown_felt.jpg': 'brown', 'desert_felt.jpg': 'brown',
+               'grey_felt.jpg': 'grey', 'gothic_felt.jpg': 'grey',
+               'purple_felt.jpg': 'purple', 'moonlight_felt.jpg': 'purple'
+            };
+            document.body.dataset.felt = feltMap[prefs.table] || 'green';
+            d.getElementById('bg-select').value = prefs.table;
+         }
+         if (prefs.card) {
+            localStorage.setItem('solitaire_card', prefs.card);
+            localStorage.setItem('solitaire_card_time', timestamp);
+            applyCardBack(prefs.card);
+            d.getElementById('card-back-select').value = prefs.card;
+         }
+      }
 
       function kvFetchFriendScores() {
          if (!kvWorkerUrl || kvFriends.length === 0) return Promise.resolve([]);
@@ -2257,8 +2296,18 @@ Optional Features:
 		});
 	}
 
-	// on page load — check KV status and sync if configured
+	// on page load — check KV status, sync scores and prefs if configured
 	if (kvWorkerUrl && kvToken) {
 		setKvIndicator('green');
 		kvCheckStatus();
+		// sync prefs — send local prefs with their timestamp, apply if KV is newer
+		var pageLoadPrefs = {
+			table: localStorage.getItem('solitaire_table') || 'green_felt.jpg',
+			card: localStorage.getItem('solitaire_card') || 'card_back_bg.png'
+		};
+		var pageLoadTime = Math.max(
+			parseInt(localStorage.getItem('solitaire_table_time') || '0'),
+			parseInt(localStorage.getItem('solitaire_card_time') || '0')
+		);
+		kvSyncPrefs(pageLoadPrefs, pageLoadTime);
 	}
