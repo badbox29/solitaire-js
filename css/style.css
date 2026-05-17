@@ -193,6 +193,43 @@ body {
    cursor: pointer;
    accent-color: #f0d080;
 }
+.kv-status {
+   display: flex;
+   align-items: center;
+   gap: 0.4em;
+}
+.kv-status label {
+   opacity: 0.7;
+   font-size: 0.85em;
+   letter-spacing: 0.03em;
+   text-transform: uppercase;
+   color: #f3f5f7;
+}
+.kv-indicator {
+   width: 10px;
+   height: 10px;
+   border-radius: 50%;
+   background: #888;
+   display: inline-block;
+   flex-shrink: 0;
+}
+.kv-indicator.green { background: #4caf50; }
+.kv-indicator.red { background: #f44336; }
+#scores-btn, #settings-btn {
+   background-color: rgba(0,0,0,0.25);
+   border: 1px solid rgba(255,255,255,0.2);
+   border-radius: 4px;
+   color: #f3f5f7;
+   padding: 0.35em 0.9em;
+   font-size: 0.85em;
+   letter-spacing: 0.03em;
+   cursor: pointer;
+   transition: background-color 0.2s, border-color 0.2s;
+}
+#scores-btn:hover, #settings-btn:hover {
+   background-color: rgba(0,0,0,0.4);
+   border-color: rgba(255,255,255,0.4);
+}
 #score .timer button {
    display: none;
    position: absolute;
@@ -909,6 +946,219 @@ body {
    body[data-felt="brown"] { --modal-bg: #2e2018; --modal-header-bg: #1c1208; --modal-btn-bg: #4a3020; }
    body[data-felt="grey"] { --modal-bg: #252525; --modal-header-bg: #151515; --modal-btn-bg: #3a3a3a; }
    body[data-felt="purple"] { --modal-bg: #2a1a3a; --modal-header-bg: #180e24; --modal-btn-bg: #3a1a5c; }
+
+/* Settings Modal */
+#settings-modal {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   z-index: 10001;
+   pointer-events: none;
+}
+#settings-modal.settings-modal-hidden {
+   display: none;
+}
+#settings-modal-box {
+   width: 380px;
+   background: var(--modal-bg);
+   border: 1px solid #f0d080;
+   border-radius: 16px;
+   overflow: hidden;
+   pointer-events: auto;
+   box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 8px 20px rgba(0,0,0,0.5);
+   max-height: 90vh;
+   overflow-y: auto;
+}
+#settings-modal-header {
+   padding: 20px 20px 0;
+   text-align: center;
+   position: relative;
+}
+#settings-modal-close {
+   position: absolute;
+   top: 16px;
+   right: 16px;
+   background: transparent;
+   border: none;
+   color: rgba(255,255,255,0.5);
+   font-size: 22px;
+   line-height: 1;
+   cursor: pointer;
+   padding: 0;
+}
+#settings-modal-close:hover {
+   color: rgba(255,255,255,0.9);
+}
+#settings-modal-title {
+   font-size: 22px;
+   font-weight: 600;
+   color: #f0d080;
+   letter-spacing: 0.04em;
+   padding-bottom: 16px;
+   border-bottom: 1px solid rgba(240,208,128,0.2);
+}
+#settings-modal-body {
+   padding: 16px 20px 20px;
+}
+.settings-section {
+   margin-bottom: 24px;
+}
+.settings-section:last-child {
+   margin-bottom: 0;
+}
+.settings-section-title {
+   font-size: 11px;
+   color: rgba(255,255,255,0.4);
+   letter-spacing: 0.1em;
+   text-transform: uppercase;
+   margin-bottom: 12px;
+}
+.settings-field {
+   margin-bottom: 12px;
+}
+.settings-field label {
+   display: block;
+   font-size: 12px;
+   color: rgba(255,255,255,0.5);
+   margin-bottom: 4px;
+   letter-spacing: 0.05em;
+}
+.settings-field input[type="text"],
+.settings-field input[type="password"] {
+   width: 100%;
+   background: rgba(0,0,0,0.3);
+   border: 1px solid rgba(255,255,255,0.15);
+   border-radius: 6px;
+   color: #f3f5f7;
+   padding: 0.5em 0.75em;
+   font-size: 13px;
+   outline: none;
+   transition: border-color 0.2s;
+   box-sizing: border-box;
+}
+.settings-field input[type="text"]:focus,
+.settings-field input[type="password"]:focus {
+   border-color: rgba(240,208,128,0.5);
+}
+#settings-username-status {
+   font-size: 12px;
+   margin-top: 5px;
+   min-height: 16px;
+}
+#settings-username-status.available { color: #4caf50; }
+#settings-username-status.taken { color: #f44336; }
+#settings-username-status.checking { color: rgba(255,255,255,0.4); }
+.settings-token-row {
+   display: flex;
+   gap: 0.5em;
+}
+.settings-token-row input {
+   flex: 1;
+}
+#settings-token-copy,
+#settings-token-change {
+   background: rgba(0,0,0,0.25);
+   border: 1px solid rgba(255,255,255,0.2);
+   border-radius: 6px;
+   color: #f3f5f7;
+   font-size: 12px;
+   padding: 0.4em 0.75em;
+   cursor: pointer;
+   transition: background-color 0.2s;
+   white-space: nowrap;
+}
+#settings-token-copy:hover,
+#settings-token-change:hover {
+   background: rgba(0,0,0,0.4);
+}
+#settings-token-change {
+   display: block;
+   margin-top: 8px;
+   width: 100%;
+}
+#settings-connect-btn {
+   width: 100%;
+   padding: 10px;
+   background: var(--modal-btn-bg);
+   border: 1px solid #f0d080;
+   border-radius: 8px;
+   color: #f0d080;
+   font-size: 14px;
+   letter-spacing: 0.05em;
+   cursor: pointer;
+   margin-top: 4px;
+   transition: background 0.2s;
+}
+#settings-connect-btn:hover:not(:disabled) {
+   background: rgba(240,208,128,0.15);
+}
+#settings-connect-btn:disabled {
+   opacity: 0.4;
+   cursor: not-allowed;
+}
+.settings-search-row {
+   display: flex;
+   gap: 0.5em;
+}
+.settings-search-row input {
+   flex: 1;
+}
+#settings-friend-search-btn {
+   background: rgba(0,0,0,0.25);
+   border: 1px solid rgba(255,255,255,0.2);
+   border-radius: 6px;
+   color: #f3f5f7;
+   font-size: 12px;
+   padding: 0.4em 0.75em;
+   cursor: pointer;
+   transition: background-color 0.2s;
+   white-space: nowrap;
+}
+#settings-friend-search-btn:hover {
+   background: rgba(0,0,0,0.4);
+}
+#settings-search-result {
+   font-size: 12px;
+   margin-top: 6px;
+   min-height: 16px;
+}
+#settings-search-result.found { color: #4caf50; }
+#settings-search-result.not-found { color: #f44336; }
+#settings-friends-list {
+   list-style: none;
+   padding: 0;
+   margin: 0;
+}
+#settings-friends-list li {
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   padding: 8px 0;
+   border-bottom: 1px solid rgba(255,255,255,0.07);
+   font-size: 13px;
+   color: rgba(255,255,255,0.7);
+}
+#settings-friends-list li:last-child {
+   border-bottom: none;
+}
+#settings-friends-list li button {
+   background: transparent;
+   border: 1px solid rgba(255,255,255,0.2);
+   border-radius: 4px;
+   color: rgba(255,255,255,0.4);
+   font-size: 11px;
+   padding: 0.2em 0.5em;
+   cursor: pointer;
+}
+#settings-friends-list li button:hover {
+   color: #f44336;
+   border-color: #f44336;
+}
    
 /* Win Modal */
 #win-modal {
@@ -952,6 +1202,21 @@ body {
    line-height: 1;
    cursor: pointer;
    padding: 0;
+}
+#win-modal-refresh {
+   position: absolute;
+   top: 16px;
+   left: 16px;
+   background: transparent;
+   border: none;
+   color: rgba(255,255,255,0.5);
+   font-size: 18px;
+   line-height: 1;
+   cursor: pointer;
+   padding: 0;
+}
+#win-modal-refresh:hover {
+   color: rgba(255,255,255,0.9);
 }
 #win-modal-close:hover {
    color: rgba(255,255,255,0.9);
@@ -1032,6 +1297,13 @@ body {
 #win-score-list li .win-score-you {
    font-size: 10px;
    color: rgba(240,208,128,0.55);
+   letter-spacing: 0.07em;
+   text-transform: uppercase;
+   margin-left: auto;
+}
+#win-score-list li .win-score-friend {
+   font-size: 10px;
+   color: rgba(150,200,255,0.7);
    letter-spacing: 0.07em;
    text-transform: uppercase;
    margin-left: auto;
