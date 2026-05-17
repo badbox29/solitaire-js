@@ -1429,7 +1429,7 @@ Optional Features:
 			 li.innerHTML =
 				'<span class="win-score-rank">#' + globalRank + '</span>' +
 				'<span class="win-score-value">' + visible[i] + '</span>' +
-				(isCurrent ? '<span class="win-score-you">you</span>' : '');
+				(isCurrent ? '<span class="win-score-you">this game</span>' : '');
 			 list.appendChild(li);
 		  }
 		  d.getElementById('win-modal').classList.remove('win-modal-hidden');
@@ -1448,8 +1448,10 @@ Optional Features:
             timer('stop');
             // bonus points for time
             updateScore(getBonus());
-			// show win modal
-			showWinModal(score);
+			// save score always
+			saveScore(score);
+			// show win modal if enabled
+			if (document.getElementById('show-scores-toggle').checked) showWinModal(score);
             // throw confetti
             throwConfetti();
             // return true
@@ -1558,7 +1560,7 @@ Optional Features:
                i--;
                if (i !== 0) animation_loop();
                // at the end lets celebrate!
-               else { showWinModal(score); throwConfetti(); }
+               else { if (document.getElementById('show-scores-toggle').checked) showWinModal(score); else saveScore(score); throwConfetti(); }
             }, 100);
          };
          // run animation loop
@@ -1784,6 +1786,12 @@ Optional Features:
 	}, { passive: false });
 
 	d.querySelector('#new-game').addEventListener('click', newGame);
+	var scoresToggle = d.getElementById('show-scores-toggle');
+	var savedToggle = localStorage.getItem('solitaire_show_scores');
+	if (savedToggle !== null) scoresToggle.checked = savedToggle === 'true';
+	scoresToggle.addEventListener('change', function() {
+		localStorage.setItem('solitaire_show_scores', this.checked);
+	});
 	d.getElementById('win-modal-close').addEventListener('click', function() {
 		d.getElementById('win-modal').classList.add('win-modal-hidden');
 	});
