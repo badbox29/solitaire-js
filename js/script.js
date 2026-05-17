@@ -145,6 +145,16 @@ Optional Features:
    var unplayedTabCards = [];
    var lastSavedScore = null;
 
+   // KV sync vars
+   var kvWorkerUrl = localStorage.getItem('solitaire_kv_url') || '';
+   var kvToken = localStorage.getItem('solitaire_kv_token') || '';
+   var kvUsername = localStorage.getItem('solitaire_kv_username') || '';
+   var kvFriends = [];
+   try {
+      var storedFriends = localStorage.getItem('solitaire_kv_friends');
+      if (storedFriends) kvFriends = JSON.parse(storedFriends);
+   } catch(e) { kvFriends = []; }
+
 // 1. CREATE DECK
    deck = create(deck, suits);
 
@@ -1389,6 +1399,83 @@ Optional Features:
          return bonus;
       }
 	  
+	  // KV sync functions
+      function kvRequest(endpoint, method, body) {
+         var url = kvWorkerUrl.replace(/\/$/, '') + endpoint;
+         var opts = {
+            method: method,
+            headers: { 'Content-Type': 'application/json' }
+         };
+         if (body) opts.body = JSON.stringify(body);
+         return fetch(url, opts).then(function(r) { return r.json(); });
+      }
+
+      function kvCheckStatus() {
+         if (!kvWorkerUrl) return;
+         kvRequest('/user/' + kvUsername, 'GET')
+            .then(function(data) {
+               setKvIndicator(data.success ? 'green' : 'red');
+            })
+            .catch(function() { setKvIndicator('red'); });
+      }
+
+      function setKvIndicator(status) {
+         var wrap = d.getElementById('kv-status');
+         var dot = d.getElementById('kv-indicator');
+         if (!kvWorkerUrl) {
+            wrap.style.display = 'none';
+            return;
+         }
+         wrap.style.display = 'flex';
+         dot.className = 'kv-indicator ' + status;
+      }
+
+      function kvSync(newScore) {
+         if (!kvWorkerUrl || !kvToken) return Promise.resolve(null);
+         var localScores = [];
+         try {
+            var stored = localStorage.getItem('solitaire-scores');
+            if (stored) localScores = JSON.parse(stored);
+         } catch(e) {}
+         return kvRequest('/sync', 'POST', { token: kvToken, scores: localScores })
+            .then(function(data) {
+               if (data.success) {
+                  setKvIndicator('green');
+                  // merge returned scores with local
+                  var merged = data.scores;
+                  merged.sort(function(a, b) { return b - a; });
+                  merged = merged.slice(0, 100);
+                  localStorage.setItem('solitaire-scores', JSON.stringify(merged));
+                  return merged;
+               } else {
+                  setKvIndicator('red');
+                  return null;
+               }
+            })
+            .catch(function() { setKvIndicator('red'); return null; });
+      }
+
+      function kvFetchFriendScores() {
+         if (!kvWorkerUrl || kvFriends.length === 0) return Promise.resolve([]);
+         var promises = kvFriends.map(function(username) {
+            return kvRequest('/user/' + username, 'GET')
+               .then(function(data) {
+                  if (data.success) {
+                     return data.scores.map(function(s) {
+                        return { score: s, username: username };
+                     });
+                  }
+                  return [];
+               })
+               .catch(function() { return []; });
+         });
+         return Promise.all(promises).then(function(results) {
+            var all = [];
+            results.forEach(function(r) { all = all.concat(r); });
+            return all;
+         });
+      }
+	  
 	  // save score to storage
 	   function saveScore(score) {
 		  var scores = [];
@@ -1412,24 +1499,56 @@ Optional Features:
 
 	// show win modal
 	   function showWinModal(currentScore) {
-		  var scores = saveScore(currentScore);
-		  var rank = scores.indexOf(currentScore);
-		  var total = scores.length;
+		  kvFetchFriendScores().then(function(friendScores) {
+			 renderWinModal(currentScore, friendScores);
+		  });
+	   }
+
+	// render win modal list
+	   function renderWinModal(currentScore, friendScores) {
+		  var localScores = [];
+		  try {
+			 var stored = localStorage.getItem('solitaire-scores');
+			 if (stored) localScores = JSON.parse(stored);
+		  } catch(e) {}
+
+		  // build combined list
+		  var combined = localScores.map(function(s) {
+			 return { score: s, username: null };
+		  });
+		  if (friendScores && friendScores.length) {
+			 combined = combined.concat(friendScores);
+		  }
+		  combined.sort(function(a, b) { return b.score - a.score; });
+
+		  // find current score position
+		  var rank = -1;
+		  for (var i = 0; i < combined.length; i++) {
+			 if (combined[i].score === currentScore && combined[i].username === null) {
+				rank = i;
+				break;
+			 }
+		  }
+
+		  var total = combined.length;
 		  var start = Math.max(0, rank - 5);
 		  var end = Math.min(total, start + 11);
 		  if (end - start < 11) start = Math.max(0, end - 11);
-		  var visible = scores.slice(start, end);
+		  var visible = combined.slice(start, end);
+
 		  var list = d.getElementById('win-score-list');
 		  list.innerHTML = '';
 		  for (var i = 0; i < visible.length; i++) {
+			 var item = visible[i];
 			 var li = d.createElement('li');
 			 var globalRank = start + i + 1;
 			 var isCurrent = (start + i === rank);
 			 if (isCurrent) li.className = 'win-score-current';
 			 li.innerHTML =
 				'<span class="win-score-rank">#' + globalRank + '</span>' +
-				'<span class="win-score-value">' + visible[i] + '</span>' +
-				(isCurrent ? '<span class="win-score-you">this game</span>' : '');
+				'<span class="win-score-value">' + item.score + '</span>' +
+				(isCurrent ? '<span class="win-score-you">this game</span>' : '') +
+				(item.username ? '<span class="win-score-friend">' + item.username + '</span>' : '');
 			 list.appendChild(li);
 		  }
 		  d.getElementById('win-modal').classList.remove('win-modal-hidden');
@@ -1448,12 +1567,17 @@ Optional Features:
             timer('stop');
             // bonus points for time
             updateScore(getBonus());
-			// save score always
-			saveScore(score);
-			// show win modal if enabled
-			if (document.getElementById('show-scores-toggle').checked) showWinModal(score);
+            // save score locally always
+            saveScore(score);
             // throw confetti
             throwConfetti();
+            // sync with KV then show modal
+            var finalScore = score;
+            kvSync(finalScore).then(function() {
+               if (document.getElementById('show-scores-toggle').checked) {
+                  showWinModal(finalScore);
+               }
+            });
             // return true
             return true;
          }
@@ -1560,7 +1684,16 @@ Optional Features:
                i--;
                if (i !== 0) animation_loop();
                // at the end lets celebrate!
-               else { if (document.getElementById('show-scores-toggle').checked) showWinModal(score); else saveScore(score); throwConfetti(); }
+               else {
+                  saveScore(score);
+                  throwConfetti();
+                  var finalScore = score;
+                  kvSync(finalScore).then(function() {
+                     if (document.getElementById('show-scores-toggle').checked) {
+                        showWinModal(finalScore);
+                     }
+                  });
+               }
             }, 100);
          };
          // run animation loop
@@ -1786,12 +1919,34 @@ Optional Features:
 	}, { passive: false });
 
 	d.querySelector('#new-game').addEventListener('click', newGame);
+
+	// show scores toggle
 	var scoresToggle = d.getElementById('show-scores-toggle');
 	var savedToggle = localStorage.getItem('solitaire_show_scores');
 	if (savedToggle !== null) scoresToggle.checked = savedToggle === 'true';
+	updateScoresButtonVisibility();
 	scoresToggle.addEventListener('change', function() {
 		localStorage.setItem('solitaire_show_scores', this.checked);
+		updateScoresButtonVisibility();
 	});
+
+	function updateScoresButtonVisibility() {
+		var wrap = d.getElementById('scores-btn-wrap');
+		wrap.style.display = scoresToggle.checked ? 'inline-flex' : 'none';
+	}
+
+	// scores button
+	d.getElementById('scores-btn').addEventListener('click', function() {
+		var localScores = [];
+		try {
+			var stored = localStorage.getItem('solitaire-scores');
+			if (stored) localScores = JSON.parse(stored);
+		} catch(e) {}
+		var topScore = localScores.length ? localScores[0] : 0;
+		showWinModal(topScore);
+	});
+
+	// win modal close/new game
 	d.getElementById('win-modal-close').addEventListener('click', function() {
 		d.getElementById('win-modal').classList.add('win-modal-hidden');
 	});
@@ -1799,3 +1954,311 @@ Optional Features:
 		d.getElementById('win-modal').classList.add('win-modal-hidden');
 		newGame();
 	});
+
+	// win modal refresh
+	d.getElementById('win-modal-refresh').addEventListener('click', function() {
+		var localScores = [];
+		try {
+			var stored = localStorage.getItem('solitaire-scores');
+			if (stored) localScores = JSON.parse(stored);
+		} catch(e) {}
+		var topScore = localScores.length ? localScores[0] : 0;
+		kvSync(topScore).then(function() {
+			kvFetchFriendScores().then(function(friendScores) {
+				renderWinModal(topScore, friendScores);
+			});
+		});
+	});
+
+	// settings modal open/close
+	d.getElementById('settings-btn').addEventListener('click', function() {
+		openSettingsModal();
+	});
+	d.getElementById('settings-modal-close').addEventListener('click', function() {
+		d.getElementById('settings-modal').classList.add('settings-modal-hidden');
+	});
+
+	// settings modal logic
+	function openSettingsModal() {
+		var workerInput = d.getElementById('settings-worker-url');
+		var usernameInput = d.getElementById('settings-username');
+		var tokenInput = d.getElementById('settings-token');
+		var connectBtn = d.getElementById('settings-connect-btn');
+		var tokenField = d.getElementById('settings-token-field');
+		var usernameField = d.getElementById('settings-username-field');
+
+		workerInput.value = kvWorkerUrl;
+
+		if (kvToken && kvUsername) {
+			// existing user
+			usernameInput.value = kvUsername;
+			usernameInput.disabled = true;
+			tokenInput.value = kvToken;
+			tokenField.style.display = 'block';
+			connectBtn.textContent = 'Save';
+			connectBtn.disabled = false;
+			d.getElementById('settings-username-status').textContent = '';
+			d.getElementById('settings-username-status').className = '';
+		} else if (kvToken && !kvUsername) {
+			// has token but no username — connect flow
+			usernameInput.value = '';
+			usernameInput.disabled = true;
+			tokenInput.value = kvToken;
+			tokenField.style.display = 'block';
+			connectBtn.textContent = 'Connect';
+			connectBtn.disabled = false;
+		} else {
+			// new user
+			usernameInput.value = '';
+			usernameInput.disabled = false;
+			tokenInput.value = '';
+			tokenField.style.display = 'none';
+			connectBtn.textContent = 'Register';
+			connectBtn.disabled = true;
+			d.getElementById('settings-username-status').textContent = '';
+			d.getElementById('settings-username-status').className = '';
+		}
+
+		renderFriendsList();
+		d.getElementById('settings-modal').classList.remove('settings-modal-hidden');
+	}
+
+	// username availability check with debounce
+	var usernameCheckTimer = null;
+	d.getElementById('settings-username').addEventListener('input', function() {
+		var val = this.value.toLowerCase().trim();
+		var status = d.getElementById('settings-username-status');
+		var connectBtn = d.getElementById('settings-connect-btn');
+		connectBtn.disabled = true;
+		status.textContent = '';
+		status.className = '';
+		clearTimeout(usernameCheckTimer);
+		if (val.length < 3) return;
+		if (!/^[a-z0-9_-]+$/.test(val)) {
+			status.textContent = 'Only letters, numbers, hyphens and underscores allowed';
+			status.className = 'taken';
+			return;
+		}
+		status.textContent = 'Checking...';
+		status.className = 'checking';
+		usernameCheckTimer = setTimeout(function() {
+			var workerUrl = d.getElementById('settings-worker-url').value.trim();
+			if (!workerUrl) {
+				status.textContent = 'Enter a worker URL first';
+				status.className = 'taken';
+				return;
+			}
+			fetch(workerUrl.replace(/\/$/, '') + '/search/' + val)
+				.then(function(r) { return r.json(); })
+				.then(function(data) {
+					if (data.available) {
+						status.textContent = '✓ Username is available';
+						status.className = 'available';
+						connectBtn.disabled = false;
+					} else {
+						status.textContent = '✗ Username is taken';
+						status.className = 'taken';
+						connectBtn.disabled = true;
+					}
+				})
+				.catch(function() {
+					status.textContent = 'Could not reach worker';
+					status.className = 'taken';
+				});
+		}, 500);
+	});
+
+	// connect/register button
+	d.getElementById('settings-connect-btn').addEventListener('click', function() {
+		var workerUrl = d.getElementById('settings-worker-url').value.trim();
+		var usernameInput = d.getElementById('settings-username');
+		var tokenInput = d.getElementById('settings-token');
+		var connectBtn = this;
+
+		kvWorkerUrl = workerUrl;
+		localStorage.setItem('solitaire_kv_url', kvWorkerUrl);
+
+		if (kvToken && kvUsername) {
+			// just saving worker url
+			setKvIndicator('green');
+			kvCheckStatus();
+			d.getElementById('settings-modal').classList.add('settings-modal-hidden');
+			return;
+		}
+
+		var pastedToken = tokenInput.value.trim();
+		if (pastedToken) {
+			// connect flow — validate token
+			connectBtn.disabled = true;
+			connectBtn.textContent = 'Connecting...';
+			fetch(workerUrl.replace(/\/$/, '') + '/connect', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ token: pastedToken })
+			}).then(function(r) { return r.json(); })
+			.then(function(data) {
+				if (data.success) {
+					kvToken = pastedToken;
+					kvUsername = data.username;
+					localStorage.setItem('solitaire_kv_token', kvToken);
+					localStorage.setItem('solitaire_kv_username', kvUsername);
+					// merge scores
+					var localScores = [];
+					try {
+						var stored = localStorage.getItem('solitaire-scores');
+						if (stored) localScores = JSON.parse(stored);
+					} catch(e) {}
+					var merged = localScores.concat(data.scores);
+					merged.sort(function(a, b) { return b - a; });
+					merged = merged.slice(0, 100);
+					localStorage.setItem('solitaire-scores', JSON.stringify(merged));
+					setKvIndicator('green');
+					d.getElementById('settings-modal').classList.add('settings-modal-hidden');
+				} else {
+					connectBtn.disabled = false;
+					connectBtn.textContent = 'Connect';
+					d.getElementById('settings-username-status').textContent = 'Invalid token';
+					d.getElementById('settings-username-status').className = 'taken';
+				}
+			}).catch(function() {
+				connectBtn.disabled = false;
+				connectBtn.textContent = 'Connect';
+				d.getElementById('settings-username-status').textContent = 'Could not reach worker';
+				d.getElementById('settings-username-status').className = 'taken';
+			});
+			return;
+		}
+
+		// register flow
+		var username = usernameInput.value.toLowerCase().trim();
+		connectBtn.disabled = true;
+		connectBtn.textContent = 'Registering...';
+		var localScores = [];
+		try {
+			var stored = localStorage.getItem('solitaire-scores');
+			if (stored) localScores = JSON.parse(stored);
+		} catch(e) {}
+		fetch(workerUrl.replace(/\/$/, '') + '/register', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ username: username, scores: localScores })
+		}).then(function(r) { return r.json(); })
+		.then(function(data) {
+			if (data.success) {
+				kvToken = data.token;
+				kvUsername = data.username;
+				localStorage.setItem('solitaire_kv_token', kvToken);
+				localStorage.setItem('solitaire_kv_username', kvUsername);
+				setKvIndicator('green');
+				d.getElementById('settings-modal').classList.add('settings-modal-hidden');
+			} else {
+				connectBtn.disabled = false;
+				connectBtn.textContent = 'Register';
+				d.getElementById('settings-username-status').textContent = data.error || 'Registration failed';
+				d.getElementById('settings-username-status').className = 'taken';
+			}
+		}).catch(function() {
+			connectBtn.disabled = false;
+			connectBtn.textContent = 'Register';
+			d.getElementById('settings-username-status').textContent = 'Could not reach worker';
+			d.getElementById('settings-username-status').className = 'taken';
+		});
+	});
+
+	// change token button
+	d.getElementById('settings-token-change').addEventListener('click', function() {
+		if (!confirm('This will disconnect your current account. Are you sure?')) return;
+		kvToken = '';
+		kvUsername = '';
+		localStorage.removeItem('solitaire_kv_token');
+		localStorage.removeItem('solitaire_kv_username');
+		setKvIndicator('');
+		openSettingsModal();
+	});
+
+	// copy token button
+	d.getElementById('settings-token-copy').addEventListener('click', function() {
+		var tokenInput = d.getElementById('settings-token');
+		navigator.clipboard.writeText(tokenInput.value).then(function() {
+			var btn = d.getElementById('settings-token-copy');
+			btn.textContent = 'Copied!';
+			setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+		});
+	});
+
+	// friend search
+	d.getElementById('settings-friend-search-btn').addEventListener('click', function() {
+		var val = d.getElementById('settings-friend-search').value.toLowerCase().trim();
+		var result = d.getElementById('settings-search-result');
+		if (!val) return;
+		if (val === kvUsername) {
+			result.textContent = "That's you!";
+			result.className = 'not-found';
+			return;
+		}
+		if (kvFriends.indexOf(val) >= 0) {
+			result.textContent = 'Already following ' + val;
+			result.className = 'not-found';
+			return;
+		}
+		result.textContent = 'Searching...';
+		result.className = '';
+		fetch(kvWorkerUrl.replace(/\/$/, '') + '/user/' + val)
+			.then(function(r) { return r.json(); })
+			.then(function(data) {
+				if (data.success) {
+					result.textContent = '✓ Found ' + val + ' — ';
+					result.className = 'found';
+					var addBtn = d.createElement('button');
+					addBtn.textContent = 'Add';
+					addBtn.style.cssText = 'background:transparent;border:1px solid #4caf50;border-radius:4px;color:#4caf50;font-size:11px;padding:0.2em 0.5em;cursor:pointer;margin-left:4px;';
+					addBtn.addEventListener('click', function() {
+						kvFriends.push(val);
+						localStorage.setItem('solitaire_kv_friends', JSON.stringify(kvFriends));
+						d.getElementById('settings-friend-search').value = '';
+						result.textContent = '';
+						result.className = '';
+						renderFriendsList();
+					});
+					result.appendChild(addBtn);
+				} else {
+					result.textContent = '✗ User not found';
+					result.className = 'not-found';
+				}
+			}).catch(function() {
+				result.textContent = 'Could not reach worker';
+				result.className = 'not-found';
+			});
+	});
+
+	// render friends list in settings
+	function renderFriendsList() {
+		var list = d.getElementById('settings-friends-list');
+		list.innerHTML = '';
+		if (kvFriends.length === 0) {
+			var li = d.createElement('li');
+			li.style.color = 'rgba(255,255,255,0.3)';
+			li.textContent = 'No friends added yet';
+			list.appendChild(li);
+			return;
+		}
+		kvFriends.forEach(function(username) {
+			var li = d.createElement('li');
+			var removeBtn = d.createElement('button');
+			removeBtn.textContent = 'Remove';
+			removeBtn.addEventListener('click', function() {
+				kvFriends = kvFriends.filter(function(u) { return u !== username; });
+				localStorage.setItem('solitaire_kv_friends', JSON.stringify(kvFriends));
+				renderFriendsList();
+			});
+			li.textContent = username;
+			li.appendChild(removeBtn);
+			list.appendChild(li);
+		});
+	}
+
+	// on page load — check KV status and sync if configured
+	if (kvWorkerUrl && kvToken) {
+		setKvIndicator('green');
+		kvCheckStatus();
+	}
