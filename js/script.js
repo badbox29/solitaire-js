@@ -2079,6 +2079,10 @@ Optional Features:
 			}
 		}
 	});
+
+	// username availability check with debounce
+	var usernameCheckTimer = null;
+	d.getElementById('settings-username').addEventListener('input', function() {
 		var val = this.value.toLowerCase().trim();
 		var status = d.getElementById('settings-username-status');
 		var connectBtn = d.getElementById('settings-connect-btn');
