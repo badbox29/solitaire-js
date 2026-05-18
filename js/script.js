@@ -1432,12 +1432,8 @@ Optional Features:
 
       function kvSync(newScore) {
          if (!kvWorkerUrl || !kvToken) return Promise.resolve(null);
-         var localScores = [];
-         try {
-            var stored = localStorage.getItem('solitaire-scores');
-            if (stored) localScores = JSON.parse(stored);
-         } catch(e) {}
-         return kvRequest('/sync', 'POST', { token: kvToken, scores: localScores })
+         var scoresToSend = (newScore !== null && newScore !== undefined) ? [newScore] : [];
+         return kvRequest('/sync', 'POST', { token: kvToken, scores: scoresToSend })
             .then(function(data) {
                if (data.success) {
                   setKvIndicator('green');
