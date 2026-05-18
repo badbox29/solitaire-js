@@ -2003,6 +2003,7 @@ Optional Features:
 	d.getElementById('win-modal-close').addEventListener('click', function() {
 		d.getElementById('win-modal').classList.add('win-modal-hidden');
 	});
+	d.querySelector('#new-game').addEventListener('click', newGame);
 	d.getElementById('win-modal-new-game').addEventListener('click', function() {
 		d.getElementById('win-modal').classList.add('win-modal-hidden');
 		newGame();
