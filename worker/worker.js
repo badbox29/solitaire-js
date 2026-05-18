@@ -114,10 +114,10 @@ async function handleSync(request, env, cors) {
     // Get existing record
     const record = JSON.parse(await env.soljs.get('user:' + username));
 
-    // Merge scores, sort, cap at 100
-    const merged = record.scores.concat(newScores);
-    merged.sort(function(a, b) { return b - a; });
-    record.scores = merged.slice(0, 100);
+    // Merge scores, deduplicate, sort, cap at 100
+    const merged = [...new Set(record.scores.concat(newScores))];
+    merged.sort((a, b) => b - a);
+    record.scores = merged.slice(0, 100);  
 
     // Save updated record
     await env.soljs.put('user:' + username, JSON.stringify(record));
