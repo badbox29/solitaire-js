@@ -79,6 +79,20 @@
          <div id="settings-modal-body">
 
             <div class="settings-section">
+               <div class="settings-section-title">Display</div>
+               <div class="settings-field">
+                  <div class="settings-toggle-row">
+                     <label for="show-scores-toggle">Show High Scores</label>
+                     <input type="checkbox" id="show-scores-toggle" checked>
+                  </div>
+               </div>
+               <div id="kv-status" class="kv-status" style="display:none">
+                  <span id="kv-indicator" class="kv-indicator"></span>
+                  <label>Worker Status</label>
+               </div>
+            </div>
+
+            <div class="settings-section">
                <div class="settings-section-title">KV Sync</div>
                <div class="settings-field">
                   <label>Worker URL</label>
@@ -350,15 +364,9 @@
          </div>
       </li>
    </ul><!-- /.templates -->
+  <div id="bottom-bar-wrap">
+  <div class="bottom-bar-arrow left" id="bar-arrow-left">&#8249;</div>
   <div id="bottom-bar">
-	<div id="kv-status" class="kv-status" style="display:none">
-	  <span id="kv-indicator" class="kv-indicator"></span>
-	  <label>Worker Status</label>
-	</div>
-	<div class="bg-picker">
-	  <label for="show-scores-toggle">Show High Scores</label>
-	  <input type="checkbox" id="show-scores-toggle" checked>
-	</div>
 	<div id="scores-btn-wrap" class="bg-picker" style="display:none">
 	  <button id="scores-btn">🏆 Scores</button>
 	</div>
@@ -395,6 +403,8 @@
     <div class="bg-picker">
       <button id="settings-btn">⚙️ Settings</button>
     </div>
+  </div>
+  <div class="bottom-bar-arrow right" id="bar-arrow-right">&#8250;</div>
   </div>
   <!-- partial -->
   <script src="./js/script.js"></script>
