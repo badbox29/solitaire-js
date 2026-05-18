@@ -1957,7 +1957,21 @@ Optional Features:
 	   lastTap = now;
 	}, { passive: false });
 
-	d.querySelector('#new-game').addEventListener('click', newGame);
+	// bottom bar scroll arrows
+	var bottomBar = d.getElementById('bottom-bar');
+	var arrowLeft = d.getElementById('bar-arrow-left');
+	var arrowRight = d.getElementById('bar-arrow-right');
+
+	function updateBarArrows() {
+		var scrollLeft = bottomBar.scrollLeft;
+		var maxScroll = bottomBar.scrollWidth - bottomBar.clientWidth;
+		arrowLeft.classList.toggle('visible', scrollLeft > 2);
+		arrowRight.classList.toggle('visible', scrollLeft < maxScroll - 2);
+	}
+
+	bottomBar.addEventListener('scroll', updateBarArrows);
+	window.addEventListener('resize', updateBarArrows);
+	updateBarArrows();
 
 	// show scores toggle
 	var scoresToggle = d.getElementById('show-scores-toggle');
