@@ -1259,6 +1259,14 @@ body {
 #win-modal-refresh:hover {
    color: rgba(255,255,255,0.9);
 }
+@keyframes spin-once {
+   from { transform: rotate(0deg); }
+   to   { transform: rotate(360deg); }
+}
+#win-modal-refresh.spinning {
+   color: #f0d080;
+   animation: spin-once 0.6s ease-in-out forwards;
+}
 #win-modal-close:hover {
    color: rgba(255,255,255,0.9);
 }
@@ -1300,11 +1308,33 @@ body {
    padding: 0 8px;
    line-height: 1;
 }
+#win-score-list-wrap {
+   position: relative;
+   height: 363px;
+   overflow: hidden;
+}
+#win-score-list-wrap::after {
+   content: '';
+   position: absolute;
+   bottom: 0;
+   left: 0;
+   width: 100%;
+   height: 80px;
+   background: linear-gradient(to bottom, transparent, var(--modal-bg));
+   pointer-events: none;
+   z-index: 1;
+}
 #win-score-list {
    list-style: none;
    padding: 8px 0;
    margin: 0;
-   height: 363px;
+   height: 100%;
+   overflow-y: auto;
+   scrollbar-width: none;
+   -ms-overflow-style: none;
+}
+#win-score-list::-webkit-scrollbar {
+   display: none;
 }
 #win-score-list li {
    display: flex;
