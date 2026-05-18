@@ -1587,6 +1587,17 @@ Optional Features:
 			 list.appendChild(li);
 		  }
 		  d.getElementById('win-modal').classList.remove('win-modal-hidden');
+
+		  // scroll current score into vertical center
+		  var list = d.getElementById('win-score-list');
+		  var current = list.querySelector('.win-score-current');
+		  if (current) {
+			 var listHeight = list.clientHeight;
+			 var itemHeight = current.offsetHeight;
+			 var itemTop = current.offsetTop;
+			 var scrollTo = itemTop - (listHeight / 2) + (itemHeight / 2);
+			 list.scrollTop = scrollTo;
+		  }
 	   }
 
    // check for win
@@ -2007,6 +2018,9 @@ Optional Features:
 
 	// win modal refresh
 	d.getElementById('win-modal-refresh').addEventListener('click', function() {
+		var btn = this;
+		btn.classList.add('spinning');
+		setTimeout(function() { btn.classList.remove('spinning'); }, 650);
 		var localScores = [];
 		try {
 			var stored = localStorage.getItem('solitaire-scores');
