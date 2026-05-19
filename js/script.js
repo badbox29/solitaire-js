@@ -1549,7 +1549,7 @@ Optional Features:
 
 		  // build combined list
 		  var combined = localScores.map(function(s) {
-			 return { score: s, username: null };
+			 return { score: s, username: kvUsername || 'me' };
 		  });
 		  if (friendScores && friendScores.length) {
 			 combined = combined.concat(friendScores);
@@ -1582,8 +1582,7 @@ Optional Features:
 			 li.innerHTML =
 				'<span class="win-score-rank">#' + globalRank + '</span>' +
 				'<span class="win-score-value">' + item.score + '</span>' +
-				(isCurrent ? '<span class="win-score-you">this game</span>' : '') +
-				(item.username ? '<span class="win-score-friend">' + item.username + '</span>' : '');
+				(isCurrent ? '<span class="win-score-you">this game</span>' : '<span class="win-score-friend">' + item.username + '</span>');
 			 list.appendChild(li);
 		  }
 		  d.getElementById('win-modal').classList.remove('win-modal-hidden');
