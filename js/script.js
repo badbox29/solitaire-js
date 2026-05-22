@@ -1533,14 +1533,14 @@ Optional Features:
 	   }
 
 	// show win modal
-	   function showWinModal(currentScore) {
-		  kvFetchFriendScores().then(function(friendScores) {
-			 renderWinModal(currentScore, friendScores);
-		  });
-	   }
+	   function showWinModal(currentScore, isCurrentGame) {
+			kvFetchFriendScores().then(function(friendScores) {
+				renderWinModal(currentScore, friendScores, isCurrentGame);
+			});
+		}
 
 	// render win modal list
-	   function renderWinModal(currentScore, friendScores) {
+	   function renderWinModal(currentScore, friendScores, isCurrentGame) {
 		  var localScores = [];
 		  try {
 			 var stored = localStorage.getItem('solitaire-scores');
@@ -1550,7 +1550,7 @@ Optional Features:
 		  // build combined list — mark the first entry matching currentScore as this game
 		  var marked = false;
 		  var combined = localScores.map(function(s) {
-			  if (!marked && s === currentScore) {
+			  if (isCurrentGame && !marked && s === currentScore) {
 				  marked = true;
 				  return { score: s, username: kvUsername || 'me', isCurrent: true };
 			  }
@@ -1624,7 +1624,7 @@ Optional Features:
             var finalScore = score;
             kvSync(finalScore).then(function() {
                if (document.getElementById('show-scores-toggle').checked) {
-                  showWinModal(finalScore);
+                  showWinModal(finalScore, true);
                }
             });
             // return true
@@ -1739,7 +1739,7 @@ Optional Features:
                   var finalScore = score;
                   kvSync(finalScore).then(function() {
                      if (document.getElementById('show-scores-toggle').checked) {
-                        showWinModal(finalScore);
+                        showWinModal(finalScore, true);
                      }
                   });
                }
