@@ -1590,15 +1590,17 @@ Optional Features:
 		  d.getElementById('win-modal').classList.remove('win-modal-hidden');
 
 		  // scroll current score into vertical center
-		  var list = d.getElementById('win-score-list');
-		  var current = list.querySelector('.win-score-current');
-		  if (current) {
-			  var listHeight = list.clientHeight;
-			  var itemHeight = current.offsetHeight;
-			  var itemTop = current.offsetTop;
-			  var scrollTo = itemTop - (listHeight / 2) + (itemHeight / 2);
-			  list.scrollTop = Math.max(0, scrollTo);
-		  }
+		  setTimeout(function() {
+			 var list = d.getElementById('win-score-list');
+		     var current = list.querySelector('.win-score-current');
+			 if (current) {
+			   var listHeight = list.clientHeight;
+			   var itemHeight = current.offsetHeight;
+			   var itemTop = current.offsetTop;
+			   var scrollTo = itemTop - (listHeight / 2) + (itemHeight / 2);
+			   list.scrollTop = Math.max(0, scrollTo);
+			 }
+		  }, 50);
 	   }
 
    // check for win
