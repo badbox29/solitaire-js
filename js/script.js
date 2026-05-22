@@ -1570,11 +1570,8 @@ Optional Features:
 			 }
 		  }
 
-		  var total = combined.length;
-		  var start = Math.max(0, rank - 5);
-		  var end = Math.min(total, start + 11);
-		  if (end - start < 11) start = Math.max(0, end - 11);
-		  var visible = combined.slice(start, end);
+		  var visible = combined;
+		  var start = 0;
 
 		  var list = d.getElementById('win-score-list');
 		  list.innerHTML = '';
@@ -1596,11 +1593,11 @@ Optional Features:
 		  var list = d.getElementById('win-score-list');
 		  var current = list.querySelector('.win-score-current');
 		  if (current) {
-			 var listHeight = list.clientHeight;
-			 var itemHeight = current.offsetHeight;
-			 var itemTop = current.offsetTop;
-			 var scrollTo = itemTop - (listHeight / 2) + (itemHeight / 2);
-			 list.scrollTop = scrollTo;
+			  var listHeight = list.clientHeight;
+			  var itemHeight = current.offsetHeight;
+			  var itemTop = current.offsetTop;
+			  var scrollTo = itemTop - (listHeight / 2) + (itemHeight / 2);
+			  list.scrollTop = Math.max(0, scrollTo);
 		  }
 	   }
 
