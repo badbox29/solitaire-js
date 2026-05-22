@@ -1547,9 +1547,14 @@ Optional Features:
 			 if (stored) localScores = JSON.parse(stored);
 		  } catch(e) {}
 
-		  // build combined list
+		  // build combined list — mark the first entry matching currentScore as this game
+		  var marked = false;
 		  var combined = localScores.map(function(s) {
-			 return { score: s, username: kvUsername || 'me' };
+			  if (!marked && s === currentScore) {
+				  marked = true;
+				  return { score: s, username: kvUsername || 'me', isCurrent: true };
+			  }
+			  return { score: s, username: kvUsername || 'me' };
 		  });
 		  if (friendScores && friendScores.length) {
 			 combined = combined.concat(friendScores);
@@ -1559,7 +1564,7 @@ Optional Features:
 		  // find current score position
 		  var rank = -1;
 		  for (var i = 0; i < combined.length; i++) {
-			 if (combined[i].score === currentScore && combined[i].username === null) {
+			 if (combined[i].isCurrent) {
 				rank = i;
 				break;
 			 }
