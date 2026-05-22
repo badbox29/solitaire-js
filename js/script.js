@@ -1533,14 +1533,14 @@ Optional Features:
 	   }
 
 	// show win modal
-	   function showWinModal(currentScore, isCurrentGame) {
-			kvFetchFriendScores().then(function(friendScores) {
-				renderWinModal(currentScore, friendScores, isCurrentGame);
-			});
-		}
+	   function showWinModal(currentScore, isCurrentGame, isManual) {
+		 kvFetchFriendScores().then(function(friendScores) {
+		    renderWinModal(currentScore, friendScores, isCurrentGame, isManual);
+		 });
+	   }
 
 	// render win modal list
-	   function renderWinModal(currentScore, friendScores, isCurrentGame) {
+	   function renderWinModal(currentScore, friendScores, isCurrentGame, isManual) {
 		  var localScores = [];
 		  try {
 			 var stored = localStorage.getItem('solitaire-scores');
@@ -1587,6 +1587,7 @@ Optional Features:
 				(isCurrent ? '<span class="win-score-you">this game</span>' : '<span class="win-score-friend">' + item.username + '</span>');
 			 list.appendChild(li);
 		  }
+		  d.getElementById('win-modal-title').textContent = isManual ? 'Leaderboard' : 'You Win!';
 		  d.getElementById('win-modal').classList.remove('win-modal-hidden');
 
 		  // scroll current score into vertical center
@@ -2006,7 +2007,7 @@ Optional Features:
 			if (stored) localScores = JSON.parse(stored);
 		} catch(e) {}
 		var topScore = localScores.length ? localScores[0] : 0;
-		showWinModal(topScore);
+		showWinModal(topScore, false, true);
 	});
 
 	// win modal close/new game
