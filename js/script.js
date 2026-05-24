@@ -1029,6 +1029,13 @@ Optional Features:
       function validateMove(selected, dest) {
          console.log ('Validating Move...', selected, dest);
 
+   // Prevent moves within the same pile
+         if ($table.dataset.source && $table.dataset.dest &&
+            $table.dataset.source === $table.dataset.dest) {
+            console.log('Cannot move within the same pile');
+            return false;
+         }
+
          // if selected card exists
          if (selected) {
             var sRank = parseRankAsInt(selected[0]);
