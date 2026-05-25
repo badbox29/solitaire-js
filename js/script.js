@@ -149,6 +149,7 @@ Optional Features:
    var kvWorkerUrl = localStorage.getItem('solitaire_kv_url') || '';
    var kvToken = localStorage.getItem('solitaire_kv_token') || '';
    var kvUsername = localStorage.getItem('solitaire_kv_username') || '';
+   var winModalMode = 'win';
    var kvFriends = [];
    try {
       var storedFriends = localStorage.getItem('solitaire_kv_friends');
@@ -1631,10 +1632,11 @@ Optional Features:
             // sync with KV then show modal
             var finalScore = score;
             kvSync(finalScore).then(function() {
-               if (document.getElementById('show-scores-toggle').checked) {
-                  showWinModal(finalScore, true);
-               }
-            });
+   			   if (document.getElementById('show-scores-toggle').checked) {
+      		      winModalMode = 'win';
+      		      showWinModal(finalScore, true);
+   			   }
+			});
             // return true
             return true;
          }
@@ -1747,6 +1749,7 @@ Optional Features:
                   var finalScore = score;
                   kvSync(finalScore).then(function() {
                      if (document.getElementById('show-scores-toggle').checked) {
+						winModalMode = 'win';
                         showWinModal(finalScore, true);
                      }
                   });
@@ -2008,14 +2011,15 @@ Optional Features:
 
 	// scores button
 	d.getElementById('scores-btn').addEventListener('click', function() {
-		var localScores = [];
-		try {
-			var stored = localStorage.getItem('solitaire-scores');
-			if (stored) localScores = JSON.parse(stored);
-		} catch(e) {}
-		var topScore = localScores.length ? localScores[0] : 0;
-		showWinModal(topScore, false, true);
-	});
+       var localScores = [];
+       try {
+          var stored = localStorage.getItem('solitaire-scores');
+          if (stored) localScores = JSON.parse(stored);
+       } catch(e) {}
+       var topScore = localScores.length ? localScores[0] : 0;
+       winModalMode = 'leaderboard';
+       showWinModal(topScore);
+   });
 
 	// win modal close/new game
 	d.getElementById('win-modal-close').addEventListener('click', function() {
@@ -2039,10 +2043,13 @@ Optional Features:
 		} catch(e) {}
 		var topScore = localScores.length ? localScores[0] : 0;
 		kvSync(topScore).then(function() {
-			kvFetchFriendScores().then(function(friendScores) {
-				renderWinModal(topScore, friendScores);
-			});
-		});
+    	   kvFetchFriendScores().then(function(friendScores) {
+              renderWinModal(topScore, friendScores);
+              if (winModalMode === 'leaderboard') {
+                  d.getElementById('win-modal-title').textContent = 'Leaderboard';
+              }
+           });
+        });
 	});
 
 	// settings modal open/close
