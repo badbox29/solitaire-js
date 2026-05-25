@@ -1594,7 +1594,7 @@ Optional Features:
 				(isCurrent ? '<span class="win-score-you">this game</span>' : '<span class="win-score-friend">' + item.username + '</span>');
 			 list.appendChild(li);
 		  }
-		  d.getElementById('win-modal-title').textContent = isManual ? 'Leaderboard' : 'You Win!';
+		  d.getElementById('win-modal-title').textContent = isManual ? 'Top Scores' : 'You Win!';
 		  d.getElementById('win-modal').classList.remove('win-modal-hidden');
 
 		  // scroll current score into vertical center
