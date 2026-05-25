@@ -1596,6 +1596,7 @@ Optional Features:
 			 list.appendChild(li);
 		  }
 		  d.getElementById('win-modal-title').textContent = isManual ? 'Top 100' : 'You Win!';
+		  d.getElementById('win-modal-title').textContent = winModalMode === 'leaderboard' ? 'Top 100' : 'You Win!';
 		  d.getElementById('win-modal').classList.remove('win-modal-hidden');
 
 		  // scroll current score into vertical center
