@@ -2046,7 +2046,7 @@ Optional Features:
     	   kvFetchFriendScores().then(function(friendScores) {
               renderWinModal(topScore, friendScores);
               if (winModalMode === 'leaderboard') {
-                  d.getElementById('win-modal-title').textContent = 'Leaderboard';
+                  d.getElementById('win-modal-title').textContent = 'Top 100';
               }
            });
         });
