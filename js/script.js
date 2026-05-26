@@ -1309,9 +1309,11 @@ Optional Features:
          switch (action) {
             // start timer
             case 'start' :
-               console.log('Starting Timer...');
-               // looping function
-               clock = setInterval(function() {
+				console.log('Starting Timer...');
+				// kill any existing interval before starting a new one
+			    clearInterval(clock);
+			    // looping function
+			    clock = setInterval(function() {
                   // increment
                   time++;
                   // parse minutes and seconds
