@@ -1117,14 +1117,19 @@ Optional Features:
          }
 
          // if destination is empty tableau pile
-		 if ( dest >= 1 && dest <= 7 ) {
-			console.log('Destination appears to be empty tableau');
-			if ( sRank !== 13 ) {
-				console.log('Only kings can be placed on empty tableau piles');
-				return false;
-			}
-			return true;
-		 }
+         if ( dest >= 1 && dest <= 7 ) {
+            console.log('Destination appears to be empty tableau');
+            var destPileData = table['tab'][parseInt(dest)];
+            if ( !destPileData || destPileData.length > 0 ) {
+               console.log('Pile is not empty, invalid drop on face-down cards');
+               return false;
+            }
+            if ( sRank !== 13 ) {
+               console.log('Only kings can be placed on empty tableau piles');
+               return false;
+            }
+            return true;
+         }
 	  }
 
    // make move
