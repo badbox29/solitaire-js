@@ -804,6 +804,22 @@ body {
       left: 43.5%;
    }
 
+/* flipped top row (foundations left, stock/waste right) */
+   body[data-layout="flipped"] #stock {
+      float: right;
+      margin-right: 0;
+   }
+   body[data-layout="flipped"] #waste {
+      float: right;
+      margin-right: 1.5%;
+   }
+   body[data-layout="flipped"] .fnd .pile {
+      left: 0;
+   }
+   body[data-layout="flipped"] #auto-win {
+      left: 58%;
+   }
+
 /* tableau */
    .tab .card {
       box-shadow: 0 0 5px rgba(0,0,0,.5);
