@@ -228,7 +228,8 @@ body {
    background-color: #1a5e2a;
    color: #f3f5f7;
 }
-#show-scores-toggle {
+#show-scores-toggle,
+#flip-layout-toggle {
    width: 16px;
    height: 16px;
    cursor: pointer;
