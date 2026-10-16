@@ -2002,6 +2002,21 @@ Optional Features:
 	window.addEventListener('resize', updateBarArrows);
 	updateBarArrows();
 
+	// flip layout toggle
+	var flipToggle = d.getElementById('flip-layout-toggle');
+	var savedFlip = localStorage.getItem('solitaire_flip_layout');
+	if (savedFlip !== null) flipToggle.checked = savedFlip === 'true';
+	applyFlipLayout();
+	flipToggle.addEventListener('change', function() {
+		localStorage.setItem('solitaire_flip_layout', this.checked);
+		applyFlipLayout();
+	});
+
+	function applyFlipLayout() {
+		if (flipToggle.checked) d.body.dataset.layout = 'flipped';
+		else delete d.body.dataset.layout;
+	}
+
 	// show scores toggle
 	var scoresToggle = d.getElementById('show-scores-toggle');
 	var savedToggle = localStorage.getItem('solitaire_show_scores');
